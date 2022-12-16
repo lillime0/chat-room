@@ -4,6 +4,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { formatMessage } from "./utils/messages.js";
 import { addUser, getUser, removeUser, getRoomUsers } from "./utils/users.js";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 const server = createServer(app);
@@ -11,12 +13,13 @@ const io = new Server(server);
 
 app.use(cors());
 
-// app.use(express.static(path.resolve(__dirname, "./client/dist")));
-// only when ready to deploy
-// app.get("/", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "./client", "index.html"));
-// });
-io.on("connection", socket => {
+//only when ready to deploy
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.resolve(__dirname, "./client/dist")));
+app.get("/", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/dist", "index.html"));
+});
+io.on("connection", (socket) => {
   socket.on("join", ({ username, room }, handleError) => {
     const { user, error } = addUser({ id: socket.id, username, room });
     if (error) return handleError(error);
@@ -26,7 +29,7 @@ io.on("connection", socket => {
       "message",
       formatMessage(`Welcome to ChatRoom, ${user.username}!`)
     );
-    socket.on("chat message", msg => {
+    socket.on("chat message", (msg) => {
       const user = getUser(socket.id);
       io.to(user.room).emit("message", formatMessage(msg, user.username));
     });
@@ -35,7 +38,7 @@ io.on("connection", socket => {
       .emit("message", formatMessage(`${user.username} has joined the chat!`));
     io.to(user.room).emit("room users", {
       room: user.room,
-      users: getRoomUsers(user.room)
+      users: getRoomUsers(user.room),
     });
   });
 
@@ -48,7 +51,7 @@ io.on("connection", socket => {
       );
       io.to(user.room).emit("room users", {
         room: user.room,
-        users: getRoomUsers(user.room)
+        users: getRoomUsers(user.room),
       });
     }
   });
