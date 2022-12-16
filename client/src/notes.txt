@@ -1,0 +1,2 @@
+npm i react-emoji linkify linkifyjs linkify-react
+npm uninstall react-linkify

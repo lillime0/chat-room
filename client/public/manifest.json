@@ -1,0 +1,14 @@
+{
+  "short_name": "ChatRoom",
+  "name": "Chat Room",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#00ff7f",
+  "background_color": "#4169e1"
+}
